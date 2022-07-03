@@ -193,7 +193,7 @@ function setup_variables() {
     MPFR="mpfr-4.1.0"
     MPC="mpc-1.2.1"
     ISL="isl-0.24"
-    GLIBC="glibc-2.35"
+    GLIBC="glibc-2.34"
     LINUX="5.4.195"
 
     # Start of script
@@ -767,8 +767,9 @@ function ending_info() {
     echo "\a"
 }
 
-build_lld() {
+function build_lld() {
     # from https://github.com/mvaisakh/gcc-build/blob/next/build-lld.sh
+    header "Build LLD"
     cd ${ROOT}
     git clone https://github.com/llvm/llvm-project -b main ${LLVM_BRANCH} --depth=1
     export INSTALL_LLD_DIR="${ROOT}/${TARGET}"
@@ -806,7 +807,7 @@ build_lld() {
     ninja install
     # Create proper symlinks
     cd ${INSTALL_LLD_DIR}/bin
-    ln -s lld ${TARGET_GCC}-ld.lld
+    ln -s lld ${TARGET}-ld.lld
     cd ${ROOT}
 }
 

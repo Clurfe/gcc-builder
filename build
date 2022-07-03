@@ -239,6 +239,18 @@ function parse_parameters() {
         *) die "Absent or invalid arch specified!" -h ;;
     esac
 
+    case "${arch}" in
+    "arm") ARCH_CLANG="ARM" ;;
+    "arm64") ARCH_CLANG="AArch64" ;;
+    "x86_64") ARCH_CLANG="x86-64" ;;
+    esac
+
+    case "${VERSION}" in
+    "11") LLVM_BRANCH="release/13.x" ;;
+    "12") LLVM_BRANCH="release/14.x" ;;
+    "13") LLVM_BRANCH="main" ;;
+    esac
+
     # Kernel architecture; i686 and x86_64 targets use x86
     [[ ${ARCH} = "i686" || ${ARCH} = "x86_64" ]] && KERNEL_ARCH=x86 || KERNEL_ARCH=${ARCH}
 
@@ -743,6 +755,48 @@ function ending_info() {
     echo "\a"
 }
 
+build_lld() {
+    # from https://github.com/mvaisakh/gcc-build/blob/next/build-lld.sh
+    cd ${ROOT}
+    git clone https://github.com/llvm/llvm-project -b main ${LLVM_BRANCH} --depth=1
+    export INSTALL_LLD_DIR="${ROOT}/${TARGET}"
+    export PATH="$INSTALL_LLD_DIR/bin:$PATH"
+    mkdir -p llvm/build
+    cd llvm/build
+    cmake -G "Ninja" \
+        -DLLVM_ENABLE_PROJECTS=lld \
+        -DCMAKE_CROSSCOMPILING=True \
+        -DCMAKE_INSTALL_PREFIX="$INSTALL_LLD_DIR" \
+        -DLLVM_DEFAULT_TARGET_TRIPLE=$TARGET \
+        -DLLVM_TARGET_ARCH=$ARCH_CLANG \
+        -DLLVM_TARGETS_TO_BUILD=$ARCH_CLANG \
+        -DCMAKE_CXX_COMPILER="$(which clang++)" \
+        -DCMAKE_C_COMPILER=$(which clang) \
+        -DLLVM_OPTIMIZED_TABLEGEN=True \
+        -DLLVM_USE_LINKER=lld \
+        -DLLVM_ENABLE_LTO=Full \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DLLVM_BUILD_RUNTIME=Off \
+        -DLLVM_INCLUDE_TESTS=Off \
+        -DLLVM_INCLUDE_EXAMPLES=Off \
+        -DLLVM_INCLUDE_BENCHMARKS=Off \
+        -DLLVM_ENABLE_MODULES=Off \
+        -DLLVM_ENABLE_BACKTRACES=Off \
+        -DLLVM_PARALLEL_COMPILE_JOBS=8 \
+        -DLLVM_PARALLEL_LINK_JOBS=4 \
+        -DBUILD_SHARED_LIBS=Off \
+        -DLLVM_INSTALL_TOOLCHAIN_ONLY=On \
+        -DCMAKE_C_FLAGS="-O3" \
+        -DCMAKE_CXX_FLAGS="-O3" \
+        -DLLVM_ENABLE_PIC=False \
+        ../llvm
+    ninja
+    ninja install
+    # Create proper symlinks
+    cd ${INSTALL_LLD_DIR}/bin
+    ln -s lld ${TARGET_GCC}-ld.lld
+    cd ${ROOT}
+}
 
 setup_variables
 parse_parameters "${@}"
@@ -759,6 +813,7 @@ build_headers
 build_gcc
 build_glibc
 install_gcc
+build_lld
 add_readme
 package_tc
 ending_info

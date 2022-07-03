@@ -27,10 +27,10 @@ if [[ -z "${GIT_SECRET}" ]] || [[ -z "${BOT_TOKEN}" ]];then
     exit
 fi
 
-if [[ ! -z "$(curl -X GET -H "Cache-Control: no-cache" https://api.github.com/repos/ZyCromerZ/$1/commits/$2 2>/dev/null  | grep 'date": "'$BuildDate)" ]];then
-    echo "already compiled"
-    exit
-fi
+# if [[ ! -z "$(curl -X GET -H "Cache-Control: no-cache" https://api.github.com/repos/ZyCromerZ/$1/commits/$2 2>/dev/null  | grep 'date": "'$BuildDate)" ]];then
+#     echo "already compiled"
+#     exit
+# fi
 
 export GIT_SSL_NO_VERIFY=1
 git config --global http.sslverify false
@@ -84,13 +84,13 @@ if [[ -d ${GCCType} ]];then
         cd $CURRENTMAINPATH
     fi 
     Fail="n"
-    git clone https://${GIT_SECRET}@github.com/ZyCromerZ/${GCCType} -b $GCCVersion $(pwd)/FromGithub || Fail="y"
+    git clone https://${GIT_SECRET}@github.com/ZyCromerZ/${GCCType} -b $GCCVersion-test $(pwd)/FromGithub || Fail="y"
     if [[ "$Fail" == "y" ]];then
         mkdir $(pwd)/FromGithub
         cd $(pwd)/FromGithub
         git init
         git remote add origin https://${GIT_SECRET}@github.com/ZyCromerZ/${GCCType}
-        git checkout -b $GCCVersion && cd $CURRENTMAINPATH
+        git checkout -b $GCCVersion-test && cd $CURRENTMAINPATH
         cd $CURRENTMAINPATH
     fi
     rm -fr $(pwd)/FromGithub/*

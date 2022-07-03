@@ -1,11 +1,11 @@
-name: Building new GCC 13
+name: Building new GCC with ld llvm
 
 on:
   push:
     branches:
-      - gcc/main
-  schedule:
-    - cron: '35 0 * * *'
+      - gcc/main-test
+  # schedule:
+  #   - cron: '35 0 * * *'
 
 jobs:
   arm:

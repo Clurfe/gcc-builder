@@ -16,6 +16,7 @@ CURRENTMAINPATH="$(pwd)"
 rm -rf .git
 GCCType="${1}"
 GCCVersion="${2}"
+Fail="Y"
 
 if [[ -z "${1}" ]] || [[ -z "${2}" ]] || [[ -z "${3}" ]];then
     echo "something is missing, fix it first"
@@ -77,7 +78,7 @@ git config --global http.sslverify false
 #         -d text="New Toolchain Already Builded boy%0ADate : <code>$(date +"%Y-%m-%d")</code>%0A<code> --- Detail Info About it --- </code>%0AGCC version : <code>${GCCVer}</code>%0ABINUTILS version : <code>$(cat ".BINUTILS.versionNya")</code>%0AGMP version : <code>$(cat ".GMP.versionNya")</code>%0AMPFR version : <code>$(cat ".MPFR.versionNya")</code>%0AMPC version : <code>$(cat ".MPC.versionNya")</code>%0AISL version : <code>$(cat ".ISL.versionNya")</code>%0AGCLIB version : <code>$(cat ".GCLIB.versionNya")</code>%0A%0ALink downloads : <code>${GCCLink}</code>%0A%0A-- uWu --"
 # fi
 cd $CURRENTMAINPATH
-if [[ -d ${GCCType} ]];then
+if [[ ! -e $CURRENTMAINPATH/fail.info ]] && [[ -d ${GCCType} ]];then
     if [[ -z "$GCC_HEAD_COMMIT" ]];then
         cd sources/gcc
         GCC_HEAD_COMMIT="$(git rev-parse HEAD)"

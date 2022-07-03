@@ -82,6 +82,7 @@ function die() {
     echo "${RED}${1}${RST}"
     [[ "${*}" =~ "-n" ]] && echo
     [[ "${*}" =~ "-h" ]] && help_menu
+    echo "error" > ${ROOT}/fail.info
     exit
 }
 
@@ -193,7 +194,7 @@ function setup_variables() {
     MPFR="mpfr-4.1.0"
     MPC="mpc-1.2.1"
     ISL="isl-0.24"
-    GLIBC="glibc-2.34"
+    GLIBC="glibc-2.32"
     LINUX="5.4.195"
 
     # Start of script
@@ -811,6 +812,32 @@ function build_lld() {
     cd ${ROOT}
 }
 
+function ForStripping()
+{
+    A64S=aarch64-linux-gnu-strip
+    A32S=arm-linux-gnueabi-strip
+
+    curl -LSsO "https://github.com/kdrag0n/proton-clang/raw/master/bin/strip" && chmod +x "${ROOT}/strip" && X86_STRIP="${ROOT}/strip"
+    curl -LSsO "https://github.com/kdrag0n/proton-clang/raw/master/bin/$A64S" && chmod +x "${ROOT}/$A64S" && A64_STRIP="${ROOT}/$A64S"
+    curl -LSsO "https://github.com/kdrag0n/proton-clang/raw/master/bin/$A32S" && chmod +x "${ROOT}/$A32S" && A32_STRIP="${ROOT}/$A32S"
+
+    for f in $(find "${ROOT}/${TARGET}" -type f -exec file {} \;); do
+        i=$(echo $f | awk '{print $1}'); i=${i: : -1}
+        if [ -n "$(echo $f | grep 'ARM' | grep 'aarch64' | grep 'not strip' | grep -v 'relocatable' )" ]; then
+            ${A64_STRIP} "${i}"
+            echo ${A64_STRIP} "${i}"
+        elif [ -n "$(echo $f | grep 'ARM' | grep '32.bit' | grep 'not strip' | grep -v 'relocatable' )" ]; then
+            ${A32_STRIP} "${i}"
+            echo ${A32_STRIP} "${i}"
+        elif [ -n "$(echo $f | grep 'x86' | grep 'not strip' | grep -v 'relocatable' )" ]; then
+            ${X86_STRIP} "${i}"
+            echo ${X86_STRIP} "${i}"
+        fi
+    done
+
+    rm "${ROOT}/strip" "${ROOT}/$A64S" "${ROOT}/$A32S"
+}
+
 setup_variables
 parse_parameters "${@}"
 trap 'unmount_tmpfs; die "Manually aborted!" -n' SIGINT SIGTERM
@@ -827,6 +854,8 @@ build_gcc
 build_glibc
 install_gcc
 build_lld
+ForStripping
 add_readme
 package_tc
 ending_info
+Fail="N"

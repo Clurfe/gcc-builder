@@ -1,0 +1,23 @@
+From 3ba0d6faca320ffb766f1d8954566df00493d36e Mon Sep 17 00:00:00 2001
+From: ZyCromerZ <neetroid97@gmail.com>
+Date: Mon, 4 Jul 2022 22:16:57 +0700
+Subject: [PATCH] idk
+
+Signed-off-by: ZyCromerZ <neetroid97@gmail.com>
+---
+ sysdeps/unix/sysv/linux/aarch64/sysdep.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/sysdeps/unix/sysv/linux/aarch64/sysdep.h b/sysdeps/unix/sysv/linux/aarch64/sysdep.h
+index 319a7c7ac..17d75229c 100644
+--- a/sysdeps/unix/sysv/linux/aarch64/sysdep.h
++++ b/sysdeps/unix/sysv/linux/aarch64/sysdep.h
+@@ -234,6 +234,8 @@
+ # define INTERNAL_SYSCALL_NCS(number, nr, args...)	\
+ 	INTERNAL_SYSCALL_RAW (number, nr, args)
+ 
++#undef HAVE_INTERNAL_BRK_ADDR_SYMBOL
++#define HAVE_INTERNAL_BRK_ADDR_SYMBOL 1
+ #endif	/* __ASSEMBLER__ */
+ 
+ /* Pointer mangling is supported for AArch64.  */

@@ -603,6 +603,13 @@ function setup_env() {
 
     cd ..
 
+    cd ${GLIBC} || die "glibc folder does not exist!"
+    if [[ "${GLIBC}" == "glibc-2.32" ]];then
+        patch -Np1 < "${ROOT}"/patches/GLIBC.2.32-fix-multiple-extern.patch || die "Failed to patch GLIBC source!"
+        patch -Np1 < "${ROOT}"/patches/GLIBC.2.32-update-idk.patch || die "Failed to patch GLIBC source!"
+    fi
+    cd ..
+
     if [[ -z ${VERBOSE} ]]; then
         exec 1>&5 2>&6
         header "BUILDING TOOLCHAIN"

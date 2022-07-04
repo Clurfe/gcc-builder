@@ -85,13 +85,13 @@ if [[ ! -e $CURRENTMAINPATH/fail.info ]] && [[ -d ${GCCType} ]];then
         cd $CURRENTMAINPATH
     fi 
     Fail="n"
-    git clone https://${GIT_SECRET}@github.com/ZyCromerZ/${GCCType} -b $GCCVersion-llvm $(pwd)/FromGithub || Fail="y"
+    git clone https://${GIT_SECRET}@github.com/ZyCromerZ/${GCCType} -b $GCCVersion $(pwd)/FromGithub || Fail="y"
     if [[ "$Fail" == "y" ]];then
         mkdir $(pwd)/FromGithub
         cd $(pwd)/FromGithub
         git init
         git remote add origin https://${GIT_SECRET}@github.com/ZyCromerZ/${GCCType}
-        git checkout -b $GCCVersion-llvm && cd $CURRENTMAINPATH
+        git checkout -b $GCCVersion && cd $CURRENTMAINPATH
         cd $CURRENTMAINPATH
     fi
     rm -fr $(pwd)/FromGithub/*

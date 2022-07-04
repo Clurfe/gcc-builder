@@ -194,7 +194,7 @@ function setup_variables() {
     MPFR="mpfr-4.1.0"
     MPC="mpc-1.2.1"
     ISL="isl-0.24"
-    GLIBC="glibc-2.32"
+    GLIBC="glibc-2.35"
     LINUX="5.4.195"
 
     # Start of script
@@ -651,14 +651,6 @@ function build_gcc() {
                      --enable-languages=c,c++ \
                      --target=${TARGET} \
                      --prefix="${INSTALL}" \
-                     --disable-decimal-float \
-                     --disable-gcov \
-                     --disable-libffi \
-                     --disable-libgomp \
-                     --disable-libmudflap \
-                     --disable-libquadmath \
-                     --disable-libstdcxx-pch \
-                     --disable-shared \
                      --with-newlib \
                      --with-gnu-as \
                      --with-gnu-ld \

@@ -650,8 +650,7 @@ function build_gcc() {
     ../gcc/configure "${CONFIGURATION[@]}" \
                      --enable-languages=c,c++ \
                      --target=${TARGET} \
-                     --prefix="${INSTALL}" \ 
-                     --with-gnu-as \
+                     --prefix="${INSTALL}" \
                      --with-gnu-ld \
                      --with-linker-hash-style=both
     make all-gcc "${JOBS}" || die "Error while building gcc!" -n

@@ -27,10 +27,10 @@ if [[ -z "${GIT_SECRET}" ]] || [[ -z "${BOT_TOKEN}" ]];then
     exit
 fi
 
-if [[ ! -z "$(curl -X GET -H "Cache-Control: no-cache" https://api.github.com/repos/ZyCromerZ/$1/commits/$2 2>/dev/null  | grep 'date": "'$BuildDate)" ]];then
-    echo "already compiled"
-    exit
-fi
+# if [[ ! -z "$(curl -X GET -H "Cache-Control: no-cache" https://api.github.com/repos/ZyCromerZ/$1/commits/$2 2>/dev/null  | grep 'date": "'$BuildDate)" ]];then
+#     echo "already compiled"
+#     exit
+# fi
 
 export GIT_SSL_NO_VERIFY=1
 git config --global http.sslverify false

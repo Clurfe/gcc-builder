@@ -183,7 +183,7 @@ function setup_variables() {
     CONFIGURATION=( "--disable-multilib" "--disable-werror" "--with-pkgversion=ZyC-GCC" 
                     "CFLAGS=-O3 -pipe -fstack-protector-strong -fuse-linker-plugin -ffunction-sections -fdata-sections -flto -flto-compression-level=9"
                     "CXXFLAGS=-O3 -pipe -fstack-protector-strong -fuse-linker-plugin -ffunction-sections -fdata-sections -flto -flto-compression-level=9"
-                    "LDFLAGS=-O3" "--disable-nls" "--disable-docs")
+                    "LDFLAGS=-O3")
     JOBS="-j$(($(nproc --all) + 1))"
     DEPTH_FLAG=true
 
@@ -650,15 +650,7 @@ function build_gcc() {
     ../gcc/configure "${CONFIGURATION[@]}" \
                      --enable-languages=c,c++ \
                      --target=${TARGET} \
-                     --prefix="${INSTALL}" \
-                     --disable-decimal-float \
-                     --disable-gcov \
-                     --disable-libffi \
-                     --disable-libgomp \
-                     --disable-libmudflap \
-                     --disable-libquadmath \
-                     --disable-libstdcxx-pch \
-                     --disable-shared \
+                     --prefix="${INSTALL}" \ 
                      --with-gnu-as \
                      --with-gnu-ld \
                      --with-linker-hash-style=both

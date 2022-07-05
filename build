@@ -181,8 +181,8 @@ function setup_variables() {
 
     # Configuration variables
     CONFIGURATION=( "--disable-multilib" "--disable-werror" "--with-pkgversion=ZyC-GCC" 
-                    "CFLAGS=-g0 -O3 -pipe -fstack-protector-strong -fuse-linker-plugin -ffunction-sections -fdata-sections -flto -flto-compression-level=9"
-                    "CXXFLAGS=-g0 -O3 -pipe -fstack-protector-strong -fuse-linker-plugin -ffunction-sections -fdata-sections -flto -flto-compression-level=9"
+                    "CFLAGS=-O3 -pipe -fstack-protector-strong -fuse-linker-plugin -ffunction-sections -fdata-sections -flto -flto-compression-level=9"
+                    "CXXFLAGS=-O3 -pipe -fstack-protector-strong -fuse-linker-plugin -ffunction-sections -fdata-sections -flto -flto-compression-level=9"
                     "LDFLAGS=-O3" "--disable-nls" "--disable-docs")
     JOBS="-j$(($(nproc --all) + 1))"
     DEPTH_FLAG=true
@@ -195,7 +195,7 @@ function setup_variables() {
     MPC="mpc-1.2.1"
     ISL="isl-0.24"
     GLIBC="glibc-2.35"
-    LINUX="5.4.195"
+    LINUX="5.4.203"
 
     # Start of script
     START=$(date +%s)
@@ -651,10 +651,17 @@ function build_gcc() {
                      --enable-languages=c,c++ \
                      --target=${TARGET} \
                      --prefix="${INSTALL}" \
-                     --with-newlib \
+                     --disable-decimal-float \
+                     --disable-gcov \
+                     --disable-libffi \
+                     --disable-libgomp \
+                     --disable-libmudflap \
+                     --disable-libquadmath \
+                     --disable-libstdcxx-pch \
+                     --disable-shared \
                      --with-gnu-as \
                      --with-gnu-ld \
-                     --with-linker-hash-style=gnu
+                     --with-linker-hash-style=both
     make all-gcc "${JOBS}" || die "Error while building gcc!" -n
     make install-gcc "${JOBS}" || die "Error while installing gcc!" -n
     if [[ ${ARCH} = "x86_64" ]]; then
@@ -857,4 +864,3 @@ ForStripping
 add_readme
 package_tc
 ending_info
-Fail="N"

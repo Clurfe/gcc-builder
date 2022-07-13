@@ -774,7 +774,7 @@ function ending_info() {
 
 function build_lld() {
     # from https://github.com/mvaisakh/gcc-build/blob/next/build-lld.sh
-    if [[ ${ARCH_CLANG} == "AArch64" ]];then
+    if [[ "${ARCH_CLANG}" == "AArch64" ]];then
         header "Build LLD"
         (
             cd ${ROOT}

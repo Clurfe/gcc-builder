@@ -70,7 +70,7 @@ jobs:
         if: matrix.config.misc == 'gcc'
         run: |
           chmod +x do-now.sh
-          #bash do-now.sh "${{ matrix.config.res }}" "${{ matrix.config.ver }}" "${{ matrix.config.type }}" "nozip"
+          bash do-now.sh "${{ matrix.config.res }}" "${{ matrix.config.ver }}" "${{ matrix.config.type }}" "nozip"
 
       - name: Update Info
         if: matrix.config.misc == 'info'

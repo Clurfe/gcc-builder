@@ -22,10 +22,12 @@ jobs:
           - ver: "11"
             type: "arm64"
             res: "aarch64-zyc-linux-gnu"
+            misc: "gcc"
 
           - ver: "11"
             type: "arm"
             res: "arm-zyc-linux-gnueabi"
+            misc: "gcc"
 
           - ver: "12"
             type: "arm64"
@@ -33,6 +35,16 @@ jobs:
             misc: "gcc"
 
           - ver: "12"
+            type: "arm"
+            res: "arm-zyc-linux-gnueabi"
+            misc: "gcc"
+
+          - ver: "13"
+            type: "arm64"
+            res: "aarch64-zyc-linux-gnu"
+            misc: "gcc"
+
+          - ver: "13"
             type: "arm"
             res: "arm-zyc-linux-gnueabi"
             misc: "gcc"
@@ -41,14 +53,6 @@ jobs:
             type: ""
             res: ""
             misc: "info"
-
-          - ver: "13"
-            type: "arm64"
-            res: "aarch64-zyc-linux-gnu"
-
-          - ver: "13"
-            type: "arm"
-            res: "arm-zyc-linux-gnueabi"
 
     name: GCC-${{ matrix.config.ver }}
     

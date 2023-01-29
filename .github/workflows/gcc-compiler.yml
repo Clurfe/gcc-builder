@@ -1,21 +1,39 @@
 name: Building new GCC
 
-on: [push]
+on: 
+  workflow_dispatch:
+
+env:
+  GIT_SECRET: ${{ secrets.GIT_SECRET }}
+  BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
 
 jobs:
   build:
 
-    runs-on: ubuntu-latest
-  
+    strategy:
+
+      fail-fast: false
+
+      matrix:
+        config:
+          - ver: "12"
+            type: "arm64"
+            res: "aarch64-zyc-linux-gnu"
+
+          - ver: "12"
+            type: "arm"
+            res: "arm-zyc-linux-gnueabi"
+
+    name: GCC-${{ matrix.config.ver }}
+    
+    runs-on: ubuntu-22.04
+
     container: 
-      image: zycromerz/kerneldocker:v2
+      image: zycromerz/tcdocker:v2
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Compile GCC
-      env:
-        GIT_SECRET: ${{ secrets.GIT_SECRET }}
-        BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-      run: |
-        chmod +x do-now.sh
-        #bash do-now.sh "aarch64-zyc-linux-gnu" "12" "arm64" "nozip"
+      - uses: actions/checkout@v2
+      - name: Compile GCC
+        run: |
+          chmod +x do-now.sh
+          #bash do-now.sh "${{ matrix.config.res }}" "${{ matrix.config.ver }}" "${{ matrix.config.type }}" "nozip"

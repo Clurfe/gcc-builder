@@ -1,6 +1,8 @@
 name: Building new GCC
 
 on: 
+  schedule:
+    - cron: '35 0 * * *'
   workflow_dispatch:
 
 env:
@@ -16,11 +18,27 @@ jobs:
 
       matrix:
         config:
+          - ver: "11"
+            type: "arm64"
+            res: "aarch64-zyc-linux-gnu"
+
+          - ver: "11"
+            type: "arm"
+            res: "arm-zyc-linux-gnueabi"
+
           - ver: "12"
             type: "arm64"
             res: "aarch64-zyc-linux-gnu"
 
           - ver: "12"
+            type: "arm"
+            res: "arm-zyc-linux-gnueabi"
+
+          - ver: "13"
+            type: "arm64"
+            res: "aarch64-zyc-linux-gnu"
+
+          - ver: "13"
             type: "arm"
             res: "arm-zyc-linux-gnueabi"
 

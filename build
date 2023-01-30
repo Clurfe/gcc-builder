@@ -253,10 +253,10 @@ function parse_parameters() {
 
     LLVM_BRANCH="release/11.x"
     case "${VERSION}" in
-    "10") LLVM_BRANCH="release/12.x" ;;
-    "11") LLVM_BRANCH="release/13.x" ;;
-    "12") LLVM_BRANCH="release/14.x" ;;
-    "13") LLVM_BRANCH="release/14.x" ;;
+    "10") LLVM_BRANCH="release/14.x" ;;
+    "11") LLVM_BRANCH="release/15.x" ;;
+    "12") LLVM_BRANCH="release/16.x" ;;
+    "13") LLVM_BRANCH="release/16.x" ;;
     esac
 
     case "${ARCH}" in

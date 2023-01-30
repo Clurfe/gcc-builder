@@ -193,7 +193,8 @@ function setup_variables() {
     BINUTILS_tar="2.40"
     GMP="gmp-6.2.1"
     MPFR="mpfr-4.2.0"
-    MPC="mpc-1.3.1"
+    MPC_git="master"
+    MPC_tar="mpc-1.3.1"
     ISL_git="master"
     ISL_tar="isl-0.24"
     GLIBC_git="master"
@@ -424,17 +425,17 @@ function download_sources() {
         axel https://ftp.gnu.org/gnu/gmp/${GMP}.tar.xz
     fi
 
-    if [[ ! -f ${MPC}.tar.gz ]]; then
-        header "DOWNLOADING MPC"
-        axel https://ftp.gnu.org/gnu/mpc/${MPC}.tar.gz
-    fi
-
     if [[ ! -f linux-${LINUX}.tar.xz ]]; then
         header "DOWNLOADING LINUX KERNEL"
         axel https://cdn.kernel.org/pub/linux/kernel/v${LINUX/.*}.x/linux-${LINUX}.tar.xz
     fi
 
     if [[ -z ${TARBALLS} ]]; then
+        if [[ ! -d mpc ]]; then
+            header "DOWNLOADING MPC"
+            git_clone https://gitlab.inria.fr/mpc/mpc.git -b ${MPC_git}
+        fi
+
         if [[ ! -d glibc ]]; then
             header "DOWNLOADING GLIBC"
             git_clone git://sourceware.org/git/glibc.git -b ${GLIBC_git}
@@ -456,6 +457,11 @@ function download_sources() {
             git_clone https://git.linaro.org/toolchain/gcc.git -b ${GCC}
         fi
     else
+        if [[ ! -f ${MPC_tar}.tar.gz ]]; then
+            header "DOWNLOADING MPC"
+            axel https://ftp.gnu.org/gnu/mpc/${MPC_tar}.tar.gz
+        fi
+
         if [[ ! -f ${GLIBC_tar}.tar.xz ]]; then
             header "DOWNLOADING GLIBC ${GLIBC_tar} FOR GCC ${VERSION}"
             axel https://ftp.gnu.org/gnu/glibc/${GLIBC_tar}.tar.xz
@@ -518,9 +524,9 @@ function extract_sources() {
     header "EXTRACTING DOWNLOADED TARBALLS"
     extract ${MPFR}.tar.xz ../${MPFR}
     extract ${GMP}.tar.xz ../${GMP}
-    extract ${MPC}.tar.gz ../${MPC}
     extract linux-${LINUX}.tar.xz ../linux
     if [[ -n ${TARBALLS} ]]; then
+        extract ${MPC_tar}.tar.gz ../${MPC_tar}
         extract ${GLIBC_tar}.tar.xz ../${GLIBC_tar}
         extract binutils-${BINUTILS_tar}.tar.xz ../binutils
         extract ${ISL_tar}.tar.bz2 ../${ISL_tar}
@@ -596,10 +602,11 @@ function setup_env() {
     cd gcc || die "GCC folder does not exit!"
     ln -s -f "${ROOT}/${MPFR}" mpfr
     ln -s -f "${ROOT}/${GMP}" gmp
-    ln -s -f "${ROOT}/${MPC}" mpc
     if [[ -n ${TARBALLS} ]]; then
+        ln -s -f "${ROOT}/${MPC_tar}" mpc
         ln -s -f "${ROOT}/${ISL_tar}" isl
     else
+        ln -s -f "${ROOT}/mpc" mpc
         ln -s -f "${ROOT}/isl" isl
     fi
 
@@ -738,12 +745,13 @@ function add_readme() {
     echo "${GMP}" >> "${TARGET}/../.GMP.versionNya"
     echo "  * MPFR version: ${MPFR}" >> "${TARGET}/readme.md"
     echo "${MPFR}" >> "${TARGET}/../.MPFR.versionNya"
-    echo "  * MPC version: ${MPC}" >> "${TARGET}/readme.md"
-    echo "${MPC}" >> "${TARGET}/../.MPC.versionNya"
     if [[ -n ${TARBALLS} ]]; then
+        get_commits mpc MPC ${MPC_git}
         get_commits isl ISL ${GLIBC_git}
         get_commits glibc GLIBC ${ISL_git}
     else
+        echo "  * MPC version: ${MPC_tar}" >> "${TARGET}/readme.md"
+        echo "${MPC_tar}" >> "${TARGET}/../.mpc.versionNya"
         echo "  * ISL version: ${ISL_tar}" >> "${TARGET}/readme.md"
         echo "${ISL_tar}" >> "${TARGET}/../.isl.versionNya"
         echo "  * GCLIB version: ${GLIBC_tar}" >> "${TARGET}/readme.md"

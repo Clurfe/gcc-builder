@@ -73,8 +73,19 @@ git config --global http.sslverify false
 #     curl -X POST "https://api.telegram.org/bot$BOT_TOKEN/sendMessage" -d chat_id="-1001150624898" \
 #         -d "disable_web_page_preview=true" \
 #         -d "parse_mode=html" \
-#         -d text="New Toolchain Already Builded boy%0ADate : <code>$(date +"%Y-%m-%d")</code>%0A<code> --- Detail Info About it --- </code>%0AGCC version : <code>${GCCVer}</code>%0ABINUTILS version : <code>$(cat ".BINUTILS.versionNya")</code>%0AGMP version : <code>$(cat ".GMP.versionNya")</code>%0AMPFR version : <code>$(cat ".MPFR.versionNya")</code>%0AMPC version : <code>$(cat ".MPC.versionNya")</code>%0AISL version : <code>$(cat ".ISL.versionNya")</code>%0AGCLIB version : <code>$(cat ".GCLIB.versionNya")</code>%0A%0ALink downloads : <code>${GCCLink}</code>%0A%0A-- uWu --"
+#         -d text="New Toolchain Already Builded boy%0ADate : <code>$(date +"%Y-%m-%d")</code>%0A<code> --- Detail Info About it --- </code>%0AGCC version : <code>${GCCVer}</code>%0ABINUTILS version : <code>$(cat ".BINUTILS.versionNya")</code>%0AGMP version : <code>$(cat ".GMP.versionNya")</code>%0AMPFR version : <code>$(cat ".mpfr.versionNya")</code>%0AMPC version : <code>$(cat ".mpc.versionNya")</code>%0AISL version : <code>$(cat ".isl.versionNya")</code>%0AGCLIB version : <code>$(cat ".glibc.versionNya")</code>%0A%0ALink downloads : <code>${GCCLink}</code>%0A%0A-- uWu --"
 # fi
+TryCount="0"
+rePush()
+{
+    if [[ "$TryCount" != "10" ]];then
+        TryCount=$(($TryCount+1))
+        sleep 1s
+        git push --all origin -f || rePush
+    fi
+
+}
+
 cd $CURRENTMAINPATH
 if [[ ! -e $CURRENTMAINPATH/fail.info ]] && [[ -d ${GCCType} ]];then
     if [[ -z "$GCC_HEAD_COMMIT" ]];then
@@ -98,7 +109,7 @@ if [[ ! -e $CURRENTMAINPATH/fail.info ]] && [[ -d ${GCCType} ]];then
 
     GCC VERSION: $( ../${GCCType}/bin/${GCCType}-gcc --version | head -n 1)
     GCC COMMIT URL: https://github.com/gcc-mirror/gcc/commit/${GCC_HEAD_COMMIT}"
-    git push --all origin -f
+    git push --all origin -f || rePush
     cd $CURRENTMAINPATH
 
     if [[ ! -z "${4}" ]] && [[ "${4}" == "nozip" ]];then
@@ -108,7 +119,7 @@ if [[ ! -e $CURRENTMAINPATH/fail.info ]] && [[ -d ${GCCType} ]];then
             curl -X POST "https://api.telegram.org/bot$BOT_TOKEN/sendMessage" -d chat_id="-1001628919239" \
                 -d "disable_web_page_preview=true" \
                 -d "parse_mode=html" \
-                -d text="New Toolchain Already Builded boy%0ADate : <code>$(date +"%Y-%m-%d")</code>%0A<code> --- Detail Info About it --- </code>%0AGCC version : <code>${GCCVer}</code>%0ABINUTILS version : <code>$(cat ".BINUTILS.versionNya")</code>%0AGMP version : <code>$(cat ".GMP.versionNya")</code>%0AMPFR version : <code>$(cat ".MPFR.versionNya")</code>%0AMPC version : <code>$(cat ".MPC.versionNya")</code>%0AISL version : <code>$(cat ".ISL.versionNya")</code>%0AGCLIB version : <code>$(cat ".GCLIB.versionNya")</code>%0A%0AGCC Link : <code>https://github.com/ZyCromerZ/${GCCType}</code>%0A%0A-- uWu --"
+                -d text="New Toolchain Already Builded boy%0ADate : <code>$(date +"%Y-%m-%d")</code>%0A<code> --- Detail Info About it --- </code>%0AGCC version : <code>${GCCVer}</code>%0ABINUTILS version : <code>$(cat ".BINUTILS.versionNya")</code>%0AGMP version : <code>$(cat ".GMP.versionNya")</code>%0AMPFR version : <code>$(cat ".mpfr.versionNya")</code>%0AMPC version : <code>$(cat ".mpc.versionNya")</code>%0AISL version : <code>$(cat ".isl.versionNya")</code>%0AGCLIB version : <code>$(cat ".glibc.versionNya")</code>%0A%0AGCC Link : <code>https://github.com/ZyCromerZ/${GCCType}</code>%0A%0A-- uWu --"
         fi
     fi
 fi

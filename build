@@ -192,7 +192,8 @@ function setup_variables() {
     BINUTILS_git="master"
     BINUTILS_tar="2.40"
     GMP="gmp-6.2.1"
-    MPFR="mpfr-4.2.0"
+    MPFR_git="master"
+    MPFR_tar="mpfr-4.2.0"
     MPC_git="master"
     MPC_tar="mpc-1.3.1"
     ISL_git="master"
@@ -415,11 +416,6 @@ function build_binaries() {
 function download_sources() {
     cd sources || die "Failed to create sources directory!"
 
-    if [[ ! -f ${MPFR}.tar.xz ]]; then
-        header "DOWNLOADING MPFR"
-        axel https://www.mpfr.org/mpfr-current/${MPFR}.tar.xz
-    fi
-
     if [[ ! -f ${GMP}.tar.xz ]]; then
         header "DOWNLOADING GMP"
         axel https://ftp.gnu.org/gnu/gmp/${GMP}.tar.xz
@@ -431,6 +427,11 @@ function download_sources() {
     fi
 
     if [[ -z ${TARBALLS} ]]; then
+        if [[ ! -d mpfr ]]; then
+            header "DOWNLOADING MPFR"
+            git clone https://gitlab.inria.fr/mpfr/mpfr.git -b ${MPFR_git} mpfr
+        fi
+
         if [[ ! -d mpc ]]; then
             header "DOWNLOADING MPC"
             git_clone https://gitlab.inria.fr/mpc/mpc.git -b ${MPC_git}
@@ -457,6 +458,11 @@ function download_sources() {
             git_clone https://git.linaro.org/toolchain/gcc.git -b ${GCC}
         fi
     else
+        if [[ ! -f ${MPFR_tar}.tar.xz ]]; then
+            header "DOWNLOADING MPFR"
+            axel https://www.mpfr.org/mpfr-current/${MPFR_tar}.tar.xz
+        fi
+
         if [[ ! -f ${MPC_tar}.tar.gz ]]; then
             header "DOWNLOADING MPC"
             axel https://ftp.gnu.org/gnu/mpc/${MPC_tar}.tar.gz
@@ -522,10 +528,10 @@ function extract() {
 # Extract tarballs to their proper locations
 function extract_sources() {
     header "EXTRACTING DOWNLOADED TARBALLS"
-    extract ${MPFR}.tar.xz ../${MPFR}
     extract ${GMP}.tar.xz ../${GMP}
     extract linux-${LINUX}.tar.xz ../linux
     if [[ -n ${TARBALLS} ]]; then
+        extract ${MPFR_tar}.tar.xz ../${MPFR_tar}
         extract ${MPC_tar}.tar.gz ../${MPC_tar}
         extract ${GLIBC_tar}.tar.xz ../${GLIBC_tar}
         extract binutils-${BINUTILS_tar}.tar.xz ../binutils
@@ -600,12 +606,13 @@ function setup_env() {
     fi
 
     cd gcc || die "GCC folder does not exit!"
-    ln -s -f "${ROOT}/${MPFR}" mpfr
     ln -s -f "${ROOT}/${GMP}" gmp
     if [[ -n ${TARBALLS} ]]; then
+        ln -s -f "${ROOT}/${MPFR_tar}" mpfr
         ln -s -f "${ROOT}/${MPC_tar}" mpc
         ln -s -f "${ROOT}/${ISL_tar}" isl
     else
+        ln -s -f "${ROOT}/mpfr" mpfr
         ln -s -f "${ROOT}/mpc" mpc
         ln -s -f "${ROOT}/isl" isl
     fi
@@ -743,13 +750,14 @@ function add_readme() {
     echo "${binutils_ver}" >> "${TARGET}/../.BINUTILS.versionNya"
     echo "  * GMP version: ${GMP}" >> "${TARGET}/readme.md"
     echo "${GMP}" >> "${TARGET}/../.GMP.versionNya"
-    echo "  * MPFR version: ${MPFR}" >> "${TARGET}/readme.md"
-    echo "${MPFR}" >> "${TARGET}/../.MPFR.versionNya"
-    if [[ -n ${TARBALLS} ]]; then
+    if [[ -z ${TARBALLS} ]]; then
+        get_commits mpfr MPFR ${MPFR_tar}
         get_commits mpc MPC ${MPC_git}
         get_commits isl ISL ${GLIBC_git}
         get_commits glibc GLIBC ${ISL_git}
     else
+        echo "  * MPFR version: ${MPFR_tar}" >> "${TARGET}/readme.md"
+        echo "${MPFR_tar}" >> "${TARGET}/../.mpfr.versionNya"
         echo "  * MPC version: ${MPC_tar}" >> "${TARGET}/readme.md"
         echo "${MPC_tar}" >> "${TARGET}/../.mpc.versionNya"
         echo "  * ISL version: ${ISL_tar}" >> "${TARGET}/readme.md"

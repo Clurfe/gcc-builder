@@ -553,6 +553,26 @@ function update_repos() {
     if [[ -z ${NO_UPDATE} && -z ${TARBALLS} ]]; then
         header "UPDATING SOURCES"
         (
+            cd mpfr || die "MPFR did not get fetched properly!"
+            ./autogen.sh
+            automake --add-missing
+        )
+        (
+            cd mpc || die "MPC did not get cloned properly!"
+            [[ -n ${FULL_SOURCE} ]] && BRANCH=origin/${MPC_git} || BRANCH=FETCH_HEAD
+            git_fetch origin ${MPC_git}
+            git checkout -f ${MPC_git} || git checkout -f -b ${MPC_git} ${BRANCH}
+            git reset --hard ${BRANCH}
+            autoreconf -i
+        )
+        (
+            cd glibc || die "GLIBC did not get cloned properly!"
+            [[ -n ${FULL_SOURCE} ]] && BRANCH=origin/${GLIBC_git} || BRANCH=FETCH_HEAD
+            git_fetch origin ${GLIBC_git}
+            git checkout -f ${GLIBC_git} || git checkout -f -b ${GLIBC_git} ${BRANCH}
+            git reset --hard ${BRANCH}
+        )
+        (
             cd isl || die "ISL did not get cloned properly!"
             [[ -n ${FULL_SOURCE} ]] && BRANCH=origin/${ISL_git} || BRANCH=FETCH_HEAD
             git_fetch origin ${ISL_git}
@@ -573,6 +593,19 @@ function update_repos() {
             git checkout -f ${GCC} || git checkout -f -b ${GCC} ${BRANCH}
         )
     else
+        if [[ -d mpfr ]]; then
+            (
+                cd mpfr || die "MPFR did not get downloaded properly!"
+                ./autogen.sh
+                automake --add-missing
+            )
+        fi
+        if [[ -d mpc ]]; then
+            (
+                cd mpc || die "MPC did not get downloaded properly!"
+                autoreconf -i
+            )
+        fi
         if [[ -d isl ]]; then
             (
                 cd isl || die "ISL did not get downloaded properly!"
@@ -585,6 +618,7 @@ function update_repos() {
 
     [[ ! -d binutils ]] && ln -s sources/binutils binutils
     [[ ! -d gcc ]] && ln -s sources/gcc gcc
+    [[ ! -d glibc ]] && ln -s sources/glibc glibc
 }
 
 

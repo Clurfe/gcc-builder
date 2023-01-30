@@ -194,7 +194,8 @@ function setup_variables() {
     GMP="gmp-6.2.1"
     MPFR="mpfr-4.2.0"
     MPC="mpc-1.3.1"
-    ISL="isl-0.24"
+    ISL_git="master"
+    ISL_tar="isl-0.24"
     GLIBC_git="master"
     GLIBC_tar="glibc-2.36"
     LINUX="5.4.230"
@@ -271,10 +272,10 @@ function parse_parameters() {
             "gnu:4") GCC=gcc-4_9-branch
                      BINUTILS_git="binutils-2_29-branch"
                      GLIBC_tar="glibc-2.26"
-                     ISL="isl-0.17.1" ;;
+                     ISL_tar="isl-0.17.1" ;;
             "gnu:5") GCC=gcc-5-branch
                      GLIBC_tar="glibc-2.27"
-                     ISL="isl-0.17.1" ;;
+                     ISL_tar="isl-0.17.1" ;;
             "gnu:6") GCC=gcc-6-branch ;;
             "gnu:7") GCC=gcc-7-branch ;;
             "gnu:8") GCC=gcc-8-branch ;;
@@ -285,10 +286,10 @@ function parse_parameters() {
             "gnu:13") GCC=master ;;
             "linaro:4") GCC=linaro-local/releases/linaro-4.9-2017.01
                         GLIBC_tar="glibc-2.27"
-                        ISL="isl-0.17.1" ;;
+                        ISL_tar="isl-0.17.1" ;;
             "linaro:5") GCC=linaro-local/gcc-5-integration-branch
                         GLIBC_tar="glibc-2.27"
-                        ISL="isl-0.17.1" ;;
+                        ISL_tar="isl-0.17.1" ;;
             "linaro:6") GCC=linaro-local/gcc-6-integration-branch ;;
             "linaro:7") GCC=linaro-local/gcc-7-integration-branch ;;
             # ARM has taken the responsibility from Linaro since 8.x
@@ -303,11 +304,11 @@ function parse_parameters() {
             "gnu:4") GCC=gcc-4.9.4
                      BINUTILS_tar="2.29.1"
                      GLIBC_tar="glibc-2.26"
-                     ISL="isl-0.17.1"
+                     ISL_tar="isl-0.17.1"
                      EXT=gz ;;
             "gnu:5") GCC=gcc-5.5.0
                      GLIBC_tar="glibc-2.27"
-                     ISL="isl-0.17.1" ;;
+                     ISL_tar="isl-0.17.1" ;;
             "gnu:6") GCC=gcc-6.5.0 ;;
             "gnu:7") GCC=gcc-7.5.0 ;;
             "gnu:8") GCC=gcc-8.4.0 ;;
@@ -318,10 +319,10 @@ function parse_parameters() {
             "gnu:13") die "GCC 13.0 is currently a WIP so there is no tarball to download! Either use the git repo or choose a new version..." ;;
             "linaro:4") GCC=linaro-4.9-2017.01
                         GLIBC_tar="glibc-2.27"
-                        ISL="isl-0.17.1" ;;
+                        ISL_tar="isl-0.17.1" ;;
             "linaro:5") GCC=linaro-5.5-2017.10
                         GLIBC_tar="glibc-2.27"
-                        ISL="isl-0.17.1" ;;
+                        ISL_tar="isl-0.17.1" ;;
             "linaro:6") GCC=linaro-snapshot-6.5-2018.11 ;;
             "linaro:7") GCC=linaro-snapshot-7.5-2019.11 ;;
             # ARM has taken the responsibility from Linaro since 8.x
@@ -447,7 +448,7 @@ function download_sources() {
         if [[ ! -d isl ]]; then
             header "DOWNLOADING ISL"
             # don't use git_clone
-            git clone git://repo.or.cz/isl.git
+            git clone git://repo.or.cz/isl.git -b ${ISL_git}
         fi
 
         if [[ ! -d gcc ]]; then
@@ -465,9 +466,9 @@ function download_sources() {
             axel https://ftp.gnu.org/gnu/binutils/binutils-${BINUTILS_tar}.tar.xz
         fi
 
-        if [[ ! -f ${ISL}.tar.bz2 ]]; then
-            header "DOWNLOADING ISL ${ISL} FOR GCC ${VERSION}"
-            axel https://sources.easybuild.io/i/ISL/${ISL}.tar.bz2
+        if [[ ! -f ${ISL_tar}.tar.bz2 ]]; then
+            header "DOWNLOADING ISL ${ISL_tar} FOR GCC ${VERSION}"
+            axel https://sources.easybuild.io/i/ISL/${ISL_tar}.tar.bz2
         fi
 
         # GNU, any version
@@ -522,7 +523,7 @@ function extract_sources() {
     if [[ -n ${TARBALLS} ]]; then
         extract ${GLIBC_tar}.tar.xz ../${GLIBC_tar}
         extract binutils-${BINUTILS_tar}.tar.xz ../binutils
-        extract ${ISL}.tar.bz2 ../${ISL}
+        extract ${ISL_tar}.tar.bz2 ../${ISL_tar}
         if [[ ${SOURCE} = "linaro" && ${VERSION} -ge 8 ]]; then
             # We can't use extract function here as this ships other GNU tools
             # Only extract GCC source and later rename it to gcc
@@ -541,8 +542,10 @@ function update_repos() {
         header "UPDATING SOURCES"
         (
             cd isl || die "ISL did not get cloned properly!"
-            git remote update
-            git checkout -f ${ISL}
+            [[ -n ${FULL_SOURCE} ]] && BRANCH=origin/${ISL_git} || BRANCH=FETCH_HEAD
+            git_fetch origin ${ISL_git}
+            git checkout -f ${ISL_git} || git checkout -f -b ${ISL_git} ${BRANCH}
+            git reset --hard ${BRANCH}
             ./autogen.sh
         )
         (
@@ -595,7 +598,7 @@ function setup_env() {
     ln -s -f "${ROOT}/${GMP}" gmp
     ln -s -f "${ROOT}/${MPC}" mpc
     if [[ -n ${TARBALLS} ]]; then
-        ln -s -f "${ROOT}/${ISL}" isl
+        ln -s -f "${ROOT}/${ISL_tar}" isl
     else
         ln -s -f "${ROOT}/isl" isl
     fi
@@ -737,13 +740,14 @@ function add_readme() {
     echo "${MPFR}" >> "${TARGET}/../.MPFR.versionNya"
     echo "  * MPC version: ${MPC}" >> "${TARGET}/readme.md"
     echo "${MPC}" >> "${TARGET}/../.MPC.versionNya"
-    echo "  * ISL version: ${ISL}" >> "${TARGET}/readme.md"
-    echo "${ISL}" >> "${TARGET}/../.ISL.versionNya"
-    if [[ "${GLIBC}" == "glibc" ]];then
-        get_commits glibc GLIBC master
+    if [[ -n ${TARBALLS} ]]; then
+        get_commits isl ISL ${GLIBC_git}
+        get_commits glibc GLIBC ${ISL_git}
     else
-        echo "  * GCLIB version: ${GLIBC}" >> "${TARGET}/readme.md"
-        echo "${GLIBC}" >> "${TARGET}/../.glibc.versionNya"
+        echo "  * ISL version: ${ISL_tar}" >> "${TARGET}/readme.md"
+        echo "${ISL_tar}" >> "${TARGET}/../.isl.versionNya"
+        echo "  * GCLIB version: ${GLIBC_tar}" >> "${TARGET}/readme.md"
+        echo "${GLIBC_tar}" >> "${TARGET}/../.glibc.versionNya"
     fi
 }
 

@@ -32,7 +32,7 @@ jobs:
             res: ""
             misc: "info"
 
-    name: GCC-${{ matrix.config.ver }}
+    name: GCC-${{ matrix.config.ver }}-${{ matrix.config.type }}
     
     runs-on: ubuntu-22.04
 

@@ -19,16 +19,6 @@ jobs:
 
       matrix:
         config:
-          - ver: "11"
-            type: "arm64"
-            res: "aarch64-zyc-linux-gnu"
-            misc: "gcc"
-
-          - ver: "11"
-            type: "arm"
-            res: "arm-zyc-linux-gnueabi"
-            misc: "gcc"
-
           - ver: "12"
             type: "arm64"
             res: "aarch64-zyc-linux-gnu"
@@ -45,6 +35,16 @@ jobs:
             misc: "gcc"
 
           - ver: "13"
+            type: "arm"
+            res: "arm-zyc-linux-gnueabi"
+            misc: "gcc"
+
+          - ver: "14"
+            type: "arm64"
+            res: "aarch64-zyc-linux-gnu"
+            misc: "gcc"
+
+          - ver: "14"
             type: "arm"
             res: "arm-zyc-linux-gnueabi"
             misc: "gcc"
